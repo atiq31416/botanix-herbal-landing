@@ -175,6 +175,7 @@
           revealOnScroll();
           window.addEventListener('scroll', revealOnScroll, { passive: true });
           window.addEventListener('resize', revealOnScroll);
+          window.setInterval(revealOnScroll, 900);
         };
         start();
       };
