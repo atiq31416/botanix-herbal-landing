@@ -161,6 +161,18 @@
             });
           }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
           targets.forEach((el) => io.observe(el));
+          const revealOnScroll = () => {
+            targets.forEach((el) => {
+              if (el.classList.contains('motion-in')) return;
+              const rect = el.getBoundingClientRect();
+              if (rect.top < window.innerHeight * 0.9 && rect.bottom > 0) {
+                el.classList.add('motion-in');
+              }
+            });
+          };
+          revealOnScroll();
+          window.addEventListener('scroll', revealOnScroll, { passive: true });
+          window.addEventListener('resize', revealOnScroll);
         };
         start();
       };
