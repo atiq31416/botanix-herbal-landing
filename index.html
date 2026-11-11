@@ -7,7 +7,7 @@
     <meta name="description" content="Botanix herbal nutrition landing page recreated from Figma." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Fustat:wght@400;500;600;700;800&family=Instrument+Serif:ital,wght@0,400;1,400&family=Inter:wght@400;500;600;700;800&family=TASA+Orbiter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -21,9 +21,106 @@
       };
     </script>
     <style>
+      @font-face {
+        font-family: 'Creato Display';
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url('./assets/fonts/CreatoDisplay-Regular.otf') format('opentype');
+      }
+      @font-face {
+        font-family: 'Creato Display';
+        font-style: normal;
+        font-weight: 500;
+        font-display: swap;
+        src: url('./assets/fonts/CreatoDisplay-Medium.otf') format('opentype');
+      }
+      @font-face {
+        font-family: 'Creato Display';
+        font-style: normal;
+        font-weight: 800;
+        font-display: swap;
+        src: url('./assets/fonts/CreatoDisplay-ExtraBold.otf') format('opentype');
+      }
+
       html, body { margin: 0; background: #f3f0e8; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
       * { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
       img { user-select: none; }
+
+      /* Map Figma-exported font names to the real webfont families. */
+      [class*='TASA_Orbiter'] { font-family: 'TASA Orbiter', Inter, ui-sans-serif, system-ui, sans-serif !important; }
+      [class*='Fustat'] { font-family: 'Fustat', Inter, ui-sans-serif, system-ui, sans-serif !important; }
+      [class*='Creato_Display'] { font-family: 'Creato Display', Inter, ui-sans-serif, system-ui, sans-serif !important; }
+      [class*='Instrument_Serif'] { font-family: 'Instrument Serif', Georgia, serif !important; }
+      [class*='Inter:'] { font-family: Inter, ui-sans-serif, system-ui, sans-serif !important; }
+      [class*=':Regular'] { font-weight: 400 !important; }
+      [class*=':Medium'] { font-weight: 500 !important; }
+      [class*=':SemiBold'] { font-weight: 600 !important; }
+      [class*=':ExtraBold'] { font-weight: 800 !important; }
+
+      /* Motion: subtle, premium, and reduced-motion safe. */
+      .motion-ready .motion-item {
+        opacity: 0;
+        transform: translateY(26px) scale(0.985);
+        transition:
+          opacity 720ms cubic-bezier(0.22, 1, 0.36, 1),
+          transform 720ms cubic-bezier(0.22, 1, 0.36, 1),
+          box-shadow 320ms ease,
+          border-color 320ms ease;
+        will-change: opacity, transform;
+      }
+      .motion-ready .motion-item.motion-in {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+      [data-name='Hero'] > div:first-child img {
+        animation: botanixHeroDrift 16s ease-in-out infinite alternate;
+        transform-origin: center;
+      }
+      [data-name^='Product card'],
+      [data-name^='Reason card'],
+      [data-name^='Card /'],
+      [data-name^='Stat card'] {
+        transition: transform 340ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 340ms ease, border-color 340ms ease !important;
+      }
+      [data-name^='Product card']:hover,
+      [data-name^='Reason card']:hover,
+      [data-name^='Card /']:hover,
+      [data-name^='Stat card']:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 26px 70px rgba(30, 32, 28, 0.14);
+      }
+      [data-name^='Button'] {
+        cursor: pointer;
+        transition: transform 240ms ease, box-shadow 240ms ease, filter 240ms ease !important;
+      }
+      [data-name^='Button']:hover {
+        transform: translateY(-2px);
+        filter: saturate(1.04);
+        box-shadow: 0 12px 30px rgba(30, 32, 28, 0.16);
+      }
+      [data-name='Nav / Links'] {
+        animation: botanixNavFloat 7s ease-in-out infinite;
+      }
+      @keyframes botanixHeroDrift {
+        from { transform: scale(1); }
+        to { transform: scale(1.045) translateX(-1.2%); }
+      }
+      @keyframes botanixNavFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-3px); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .motion-ready .motion-item,
+        .motion-ready .motion-item.motion-in,
+        [data-name='Hero'] > div:first-child img,
+        [data-name='Nav / Links'] {
+          animation: none !important;
+          transition: none !important;
+          opacity: 1 !important;
+          transform: none !important;
+        }
+      }
     </style>
   </head>
   <body>
@@ -32,6 +129,42 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script>
+      window.initBotanixMotion = function initBotanixMotion() {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        document.body.classList.add('motion-ready');
+        const interesting = /(Hero|Card|Product card|Reason card|Testimonial|CTA|Footer|Stat card|Intro|Heading|Buttons|Nav|Product grid|Reason grid|Trust row|Images)/i;
+        let attempts = 0;
+        const start = () => {
+          const targets = Array.from(document.querySelectorAll('[data-node-id], footer'))
+            .filter((el) => {
+              const name = el.getAttribute('data-name') || el.tagName;
+              if (!interesting.test(name)) return false;
+              const rect = el.getBoundingClientRect();
+              return rect.width > 24 && rect.height > 24;
+            })
+            .slice(0, 180);
+          if (!targets.length && attempts < 16) {
+            attempts += 1;
+            window.setTimeout(start, 150);
+            return;
+          }
+          targets.forEach((el, index) => {
+            el.classList.add('motion-item');
+            el.style.transitionDelay = `${(index % 14) * 42}ms`;
+          });
+          const io = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('motion-in');
+                io.unobserve(entry.target);
+              }
+            });
+          }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+          targets.forEach((el) => io.observe(el));
+        };
+        start();
+      };
+
       fetch('./src/App.jsx')
         .then((r) => r.text())
         .then((code) => {
@@ -40,6 +173,7 @@
             filename: 'App.jsx',
           }).code;
           eval(out);
+          requestAnimationFrame(() => window.initBotanixMotion && window.initBotanixMotion());
         })
         .catch((err) => {
           document.body.innerHTML = '<pre style="padding:24px;color:#b00020;white-space:pre-wrap">' + String(err.stack || err) + '</pre>';
