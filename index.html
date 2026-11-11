@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Botanix — Herbal Nutrition Landing Page</title>
+    <meta name="description" content="Botanix herbal nutrition landing page recreated from Figma." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      html, body { margin: 0; background: #f3f0e8; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+      * { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+      img { user-select: none; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script>
+      fetch('./src/App.jsx')
+        .then((r) => r.text())
+        .then((code) => {
+          const out = Babel.transform(code, {
+            presets: [['react', { runtime: 'classic' }]],
+            filename: 'App.jsx',
+          }).code;
+          eval(out);
+        })
+        .catch((err) => {
+          document.body.innerHTML = '<pre style="padding:24px;color:#b00020;white-space:pre-wrap">' + String(err.stack || err) + '</pre>';
+        });
+    </script>
+  </body>
+</html>
