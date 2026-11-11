@@ -131,6 +131,7 @@
     <script>
       window.initBotanixMotion = function initBotanixMotion() {
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        if (document.body.dataset.motionBound === '1') return;
         document.body.classList.add('motion-ready');
         const interesting = /(Hero|Card|Product card|Reason card|Testimonial|CTA|Footer|Stat card|Intro|Heading|Buttons|Nav|Product grid|Reason grid|Trust row|Images)/i;
         let attempts = 0;
@@ -148,6 +149,7 @@
             window.setTimeout(start, 150);
             return;
           }
+          document.body.dataset.motionBound = '1';
           targets.forEach((el, index) => {
             el.classList.add('motion-item');
             el.style.transitionDelay = `${(index % 14) * 42}ms`;
@@ -185,7 +187,21 @@
             filename: 'App.jsx',
           }).code;
           eval(out);
-          requestAnimationFrame(() => window.initBotanixMotion && window.initBotanixMotion());
+          const root = document.getElementById('root');
+          const bootMotion = () => requestAnimationFrame(() => window.initBotanixMotion && window.initBotanixMotion());
+          if (root && root.childElementCount > 0) {
+            bootMotion();
+          } else if (root) {
+            const mo = new MutationObserver(() => {
+              if (root.childElementCount > 0) {
+                mo.disconnect();
+                bootMotion();
+              }
+            });
+            mo.observe(root, { childList: true });
+          }
+          window.setTimeout(bootMotion, 800);
+          window.setTimeout(bootMotion, 2000);
         })
         .catch((err) => {
           document.body.innerHTML = '<pre style="padding:24px;color:#b00020;white-space:pre-wrap">' + String(err.stack || err) + '</pre>';
