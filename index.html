@@ -187,21 +187,19 @@
             filename: 'App.jsx',
           }).code;
           eval(out);
-          const root = document.getElementById('root');
-          const bootMotion = () => requestAnimationFrame(() => window.initBotanixMotion && window.initBotanixMotion());
-          if (root && root.childElementCount > 0) {
-            bootMotion();
-          } else if (root) {
-            const mo = new MutationObserver(() => {
-              if (root.childElementCount > 0) {
-                mo.disconnect();
-                bootMotion();
-              }
-            });
-            mo.observe(root, { childList: true });
-          }
-          window.setTimeout(bootMotion, 800);
-          window.setTimeout(bootMotion, 2000);
+          let boots = 0;
+          const bootMotion = () => {
+            if (document.body.dataset.motionBound === '1') return;
+            if (document.querySelectorAll('[data-node-id]').length > 10) {
+              window.initBotanixMotion && window.initBotanixMotion();
+              return;
+            }
+            if (boots < 80) {
+              boots += 1;
+              window.setTimeout(bootMotion, 250);
+            }
+          };
+          bootMotion();
         })
         .catch((err) => {
           document.body.innerHTML = '<pre style="padding:24px;color:#b00020;white-space:pre-wrap">' + String(err.stack || err) + '</pre>';
